@@ -39,7 +39,7 @@ SCHEDULER_PERSIST = True
 - mysql设置
 ```python
 MYSQL_HOST = 'localhost'
-MYSQL_DBNAME = 'amazon''
+MYSQL_DBNAME = 'weibo'
 MYSQL_USER = 'root'
 MYSQL_PASSWORD = '1234566'
 ```
