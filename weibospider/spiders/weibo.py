@@ -5,17 +5,16 @@ import scrapy
 import time
 import json
 import random
-from weibospider.items import InformationItem, HomepageItem
+from weibospider.items import InformationItem
 from scrapy_redis.spiders import RedisSpider
-
 
 class WeiboSpider(RedisSpider):
     name = "weibo"
     redis_key = "weibo:start_urls"
-
     # start_urls = ['https://weibo.cn/2716896955/follow']
 
     def parse(self, response):
+        # 爬取用户关注列表中粉丝数大于100万的账户ID
         results = response.css('table')
         for result in results:
             fans_num = int(result.re('.*?<br>粉丝(.*?)人.*')[0])
@@ -63,23 +62,3 @@ class WeiboSpider(RedisSpider):
         yield infoitem
         yield scrapy.Request(url='https://weibo.cn/' + ID + '/follow', callback=self.parse)
 
-    '''爬取首页文章及翻页,暂不设置'''
-    # def parse_homepage(self,response):
-    #     homepageitem = HomepageItem()
-    #     id_name = re.search('.*<title>(.*?)的微博。*',response.text).group(1)
-    #     ID = re.search('.*href="/(\d+)/follow.*',response.text).group(1)
-    #     follow_num = int(re.search('.*关注\[(\d+)\].*', response.text).group(1))
-    #     fans_num = int(re.search('.*粉丝\[(\d+)\].*',response.text).group(1))
-    #     results = response.css('.c')
-    #     for result in results[1:-2]:
-    #         homepageitem['id_name'] = id_name
-    #         homepageitem['ID'] = ID
-    #         homepageitem['content'] = result.xpath('.//*[@class="ctt"]/a/text()').extract_first()
-    #         homepageitem['content'] = result.css('.ctt').xpath('string(.)').extract_first().strip()
-    #         homepageitem['pubTime'] = result.css('.ct::text').re('(.*?)来自.*')[0]
-    #         homepageitem['like_num'] = int(result.re('.*?赞\[(.*?)\].*')[0])
-    #         homepageitem['comment_num'] = int(result.re('.*?评论\[(.*?)\].*')[0])
-    #         homepageitem['transfer_num'] = int(result.re('.*?转发\[(.*?)\].*')[0])
-    #         yield homepageitem
-    #         # break
-    #     yield scrapy.Request(url='https://weibo.cn/' + ID + '/info', callback=self.parse_info,meta={'fans_num': fans_num})

@@ -6,19 +6,10 @@ import requests
 from requests.exceptions import ConnectionError
 from scrapy.exceptions import IgnoreRequest
 
-
 class CookiesMiddlewares(object):
     def __init__(self, ckookies_pool_url):
         self.logger = logging.getLogger(__name__)
         self.ckookies_pool_url = ckookies_pool_url
-
-    # def get_cookies(self):
-    #     try:
-    #         r = requests.get(self.COOKIES_POOL_URL)
-    #         if r.status_code == 200:
-    #             return json.loads(r.text)
-    #     except ConnectionError:
-    #         return None
 
     @classmethod
     def from_crawler(cls, crawler):

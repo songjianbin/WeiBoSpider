@@ -1,3 +1,5 @@
+import copy
+
 import MySQLdb
 import MySQLdb.cursors
 from twisted.enterprise import adbapi
@@ -21,10 +23,11 @@ class MysqlTwistedPipeline(object):
         return cls(dbpool)
 
     def process_item(self, item, spider):
-        # 使用twised将mysql插入变成异步
-        query = self.dbpool.runInteraction(self.do_insert,item)
-        query.addErrback(self.handle_error,item,spider)
-        return item
+        # 使用深拷贝，避免插入数据库重复问题
+        asynItem = copy.deepcopy(item)
+        query = self.dbpool.runInteraction(self.do_insert, asynItem)
+        query.addErrback(self.handle_error, asynItem, spider)
+        return asynItem
 
     def handle_error(self,failure,item,spider):
         # 处理异步插入异常
